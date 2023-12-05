@@ -43,15 +43,28 @@ func main() {
 			}
 		}
 
-		if len(myWinningNumbers) > 0 {
-			//TODO: part 2
-			cardIndex := slices.IndexFunc(cardCopies, func(c Copy) bool {
-				return c.index == lineIndex
-			})
+		cardIndex := slices.IndexFunc(cardCopies, func(c Copy) bool {
+			return c.index == lineIndex
+		})
 
-			if cardIndex == -1 {
+		if cardIndex == -1 {
+			instances++
+			instancesArary[lineIndex] = 1
+			for idx := range myWinningNumbers {
+				copiesIndex := slices.IndexFunc(cardCopies, func(c Copy) bool {
+					return c.index == lineIndex+idx+1
+				})
+
+				if copiesIndex == -1 {
+					cardCopies = append(cardCopies, Copy{index: lineIndex + idx + 1, value: 1})
+				} else {
+					cardCopies[copiesIndex].value++
+				}
+			}
+		} else {
+			for cardCopies[cardIndex].value+1 > 0 {
 				instances++
-				instancesArary[lineIndex] = 1
+				instancesArary[lineIndex]++
 				for idx := range myWinningNumbers {
 					copiesIndex := slices.IndexFunc(cardCopies, func(c Copy) bool {
 						return c.index == lineIndex+idx+1
@@ -63,26 +76,11 @@ func main() {
 						cardCopies[copiesIndex].value++
 					}
 				}
-			} else {
-				for cardCopies[cardIndex].value > 0 {
-					instances++
-					instancesArary[lineIndex]++
-					for idx := range myWinningNumbers {
-						copiesIndex := slices.IndexFunc(cardCopies, func(c Copy) bool {
-							return c.index == lineIndex+idx+1
-						})
-
-						if copiesIndex == -1 {
-							cardCopies = append(cardCopies, Copy{index: lineIndex + idx + 1, value: 1})
-						} else {
-							cardCopies[copiesIndex].value++
-						}
-					}
-					cardCopies[cardIndex].value--
-				}
+				cardCopies[cardIndex].value--
 			}
-			//END TODO
+		}
 
+		if len(myWinningNumbers) > 0 {
 			pts := 1 * int(math.Pow(2, float64(len(myWinningNumbers)-1)))
 			fmt.Printf("Game %d won %d points\n", lineIndex+1, pts)
 			fmt.Println(myWinningNumbers)
